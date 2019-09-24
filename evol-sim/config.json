@@ -1,0 +1,20 @@
+{
+	"numAnimals": 1,
+	"numFoods": 1,
+	"posAnimal":[
+		{
+			"x":2,
+			"y":2
+		}
+	],
+	"posFood":[
+		{
+			"x":2,
+			"y":3
+		}
+	],
+	"worldDim": {
+		"x":10,
+		"y":10
+	}
+}
