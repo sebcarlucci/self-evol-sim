@@ -1,17 +1,13 @@
 # evol_sim.py
 import random
+import math
 
 class EvolSim:
-	def __init__(self, animal_pos, food_pos, world_dim):
-		self.animal_pos = animal_pos
+	def __init__(self, animal_num, food_num, world_dim):
+		self.animals =  
 		self.food_pos = food_pos
-		w, h = world_dim["x"], world_dim["y"]
-		self.world = [['O' for x in range(w)] for y in range(h)]
-		for a in animal_pos:
-			a["food"] = 0
-			self.world[a["x"]][a["y"]]= "A"
-		for f in food_pos:
-			self.world[f["x"]][f["y"]]= "F"
+		self.food_num = food_pos.length()
+		self.world_x, self.world_y = world_dim["x"], world_dim["y"]
 		self.day_len = 20
 		self.time = 0
 	
@@ -23,6 +19,7 @@ class EvolSim:
 			if(self.time == self.day_len):
 				self.generate()
 
+	# 0.0.0 move animals in a random direction (4-way) with constant step
 	def update_animal_pos(self):
 		for a in self.animal_pos:
 			flag = random.randint(0,2)
@@ -32,6 +29,10 @@ class EvolSim:
 			else:
 				a["y"] += 1 if pos is 1 else -1
 
+			x,y = world_dim.values()
+			print(x,y)
+
+	# 0.0.0 consume food on a first come first serve basis
 	def consume_food(self):
 		for a in self.animal_pos:
 			a_pos = dict((k, a[k]) for k in ['x', 'y'] 
@@ -44,4 +45,14 @@ class EvolSim:
 	def generate(self):
 		self.generate_food()
 		self.generate_animal()
+
+	# 0.0.0 amount of food is replenished to the same contstant amount
+	def generate_food(self):
+		new_food_pos = random.sample(range(0,self.world_x * self.world_y),self.food_num)
+		self.food_pos = map(lambda x: dict("x") ,new_food_pos)
+
+	def generate_animals(self, num):
+		new_animal_pos = random.sample(range(0,self.world_x * self.world_y), num)
+		self.animals = map(lambda n: Animal(math.floor(n/self.world_y), n % self.world_y), new_animal_pos)
+		print(self.animals)
 
