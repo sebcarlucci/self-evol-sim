@@ -1,0 +1,52 @@
+#:import hex kivy.utils.get_color_from_hex
+<PlotComponent>
+	size_hint_y: 1
+	id: 'test'
+	canvas:
+		Color:
+			rgb: hex('#3492eb')
+		Rectangle:
+			pos:self.pos
+			size:(self.width, self.val)
+
+<Plot>
+    orientation:'lr-bt'
+    id: plot
+    values:[]
+
+	canvas.before:
+		Color:
+			rgb: .95,.95,.95
+	    Rectangle:
+	    	pos:self.pos
+	    	size:self.size
+
+	on_touch_down: self.on_action()
+
+
+<RootLayout>:
+	orientation:'vertical'
+	canvas.before:
+		Color:
+			rgb: 0.1, 0.1, 0.1
+		Rectangle:
+			pos:self.pos
+			size:self.size
+
+	Label:
+		text:"Data UI"
+		size_hint_y: 0.2
+
+	BoxLayout:
+		orientation: 'horizontal'
+		Label:
+			text: 'y-axis'
+			size_hint_x: 0.05
+		Plot:
+			id: plot
+			padding: 20
+	Label:
+		text:"x-axis"
+		size_hint_y: 0.1
+
+RootLayout
