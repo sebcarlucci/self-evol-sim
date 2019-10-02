@@ -16,7 +16,7 @@ import ui_engine_api as ui_api
 food_to_survive = 2
 
 class EvolSim:
-	def __init__(self, animal_num=200, food_num=200, world_dim=(20,20), day_len=20):
+	def __init__(self, animal_num=200, food_num=600, world_dim=(200,200), day_len=20):
 		print("Initializing simulation")
 		self.food_num = food_num
 		self.animal_num = animal_num
@@ -25,20 +25,28 @@ class EvolSim:
 		self.worldFood = [[0 for i in range(self.world_y)] for j in range(self.world_x)]
 		self.generate_world(animal_num, food_num)
 	
+	'''
+	Day Engine
+	'''
 	def run(self, num_iter=1): 
 		print("Running simulation for " + str(num_iter))
-		time = 0
-		for i in range(0,num_iter):
+		num_days = int(num_iter/self.day_len)
+		# Each plot bar is a day
+		ui_api.start_plot(num_values=num_days)
+		
+		for i in range(0,num_days):
+			self.run_day()
+
+	def run_day(self):
+		for tick in range(0,self.day_len):
 			self.update_animal_pos()
 			self.consume_food()
-			time += 1
-			if(time == self.day_len):
-				surviving_animals = sum(2 if a.can_reproduce() else 1 if a.can_survive() else 0 for a in self.animals)
-				print(str(surviving_animals) + " survived!")
-				self.generate_world(surviving_animals, self.food_num)
 
-				ui_api.update_plot(surviving_animals)
-				time = 0
+		surviving_animals = sum(2 if a.can_reproduce() else 1 if a.can_survive() else 0 for a in self.animals)
+		print(str(surviving_animals) + " survived!")
+		self.generate_world(surviving_animals, self.food_num)
+
+		ui_api.update_plot(surviving_animals)
 
 	# 0.0.0 move animals in a random direction (4-way) with constant step
 	def update_animal_pos(self):

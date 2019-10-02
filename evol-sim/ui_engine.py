@@ -4,7 +4,7 @@ from kivy.app import App
 from kivy.uix.label import Label
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.stacklayout import StackLayout
-from kivy.properties import ObjectProperty
+from kivy.properties import ObjectProperty, NumericProperty
 from kivy.uix.widget import Widget
 
 from kivy.lang.builder import Builder
@@ -27,33 +27,26 @@ class PlotComponent(Widget):
 class Plot(StackLayout):
 	values = ObjectProperty()
 	id_cnt = 0
-	value_cnt = 0
 	ids = {}
+	max_val = NumericProperty(0)
 
-	def on_action(self):
-		self.value_cnt += 1
-		for i in range(0,len(self.ids)):
-			self.ids["pc_" + str(i)].size_hint_x = 1/self.value_cnt
-
-		# Add new plot component
-		new_plot_id = "pc_" + str(self.id_cnt)
-		new_plot = PlotComponent(size_hint_x=1/self.value_cnt, id=new_plot_id, val=random.randint(0,int(self.height * 0.9)))
-		self.add_widget(new_plot)
-		self.ids[new_plot_id] = new_plot
-		self.id_cnt += 1
+	def config(self, num_values):
+		self.value_cnt = num_values
 
 	def add_element(self, val):
-		self.value_cnt += 1
-		for i in range(0,len(self.ids)):
-			self.ids["pc_" + str(i)].size_hint_x = 1/self.value_cnt
-
+		if val > self.max_val:
+			self.max_val = val
 		# Add new plot component
 		new_plot_id = "pc_" + str(self.id_cnt)
-		new_plot = PlotComponent(size_hint_x=1/self.value_cnt, id=new_plot_id, val=val)
+		new_plot = PlotComponent(size_hint=(1/self.value_cnt, 0 if self.max_val is 0 else val/self.max_val), id=new_plot_id, val=val)
 		self.add_widget(new_plot)
 		self.ids[new_plot_id] = new_plot
 		self.id_cnt += 1
 
+	def on_max_val(self, instance, max_val):
+		print('new max')
+		for child in self.ids.values():
+			child.size_hint_y = child.val/max_val
 
 class RootLayout(BoxLayout):
 	pass

@@ -1,13 +1,21 @@
 #:import hex kivy.utils.get_color_from_hex
 <PlotComponent>
-	size_hint_y: 1
 	id: 'test'
+	val: 0
+
+	canvas.before:
+		Color:
+			rgb: (0.05,0.05,0.05)
+		Rectangle:
+			pos:list(map(lambda x: x-1,self.pos))
+			size: (self.width + 2, self.height + 2)
+
 	canvas:
 		Color:
 			rgb: hex('#3492eb')
 		Rectangle:
 			pos:self.pos
-			size:(self.width, self.val)
+			size:(self.width, self.height)
 
 <Plot>
     orientation:'lr-bt'
@@ -21,9 +29,6 @@
 	    	pos:self.pos
 	    	size:self.size
 
-	on_touch_down: self.on_action()
-
-
 <RootLayout>:
 	orientation:'vertical'
 	canvas.before:
@@ -32,10 +37,16 @@
 		Rectangle:
 			pos:self.pos
 			size:self.size
-
-	Label:
-		text:"Data UI"
+	BoxLayout:
+		orientation: 'horizontal'
 		size_hint_y: 0.2
+		Label:
+			text:"Data UI"
+			size_hint_x:0.8
+		Button:
+			text:"Run Sim"
+			size_hint_x: 0.2
+			on_touch_down: print('pressed')
 
 	BoxLayout:
 		orientation: 'horizontal'

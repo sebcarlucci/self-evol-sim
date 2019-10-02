@@ -10,7 +10,6 @@ def main():
 	print(name + " " + ver)
 
 	with open(DEF_CONFIG_FILE) as config_json_file:
-		ui_api.start_plot()
 		user_config = json.load(config_json_file)
 		evol_sim = EvolSim()
 		evol_sim.run(1000)
