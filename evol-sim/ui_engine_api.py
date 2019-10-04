@@ -28,9 +28,10 @@ class UIThread(AsyncMsgThread):
 		super().__init__(async_msg_object, controller)
 
 	def msg_handler(self, msg):
-		if msg is -1:
+		msg_id, msg_val = msg
+		if msg_id is -1:
 			UIVisualThread(self.ui_instance, self).start()
 			time.sleep(1) # Give the for the UI to load
-			self.ui_instance.root.ids['plot'].config(num_values=5)
+			# self.ui_instance.root.ids['plot'].config(num_values=msg_val)
 		else:
-			self.ui_instance.root.ids['plot'].add_element(msg)
+			self.ui_instance.root.ids['plot'].add_element(msg_val)
