@@ -5,21 +5,32 @@ import time
 
 import random
 
-ui_ref = None
-class UIThread(threading.Thread):
+from async_msg import AsyncMsgThread
+
+class UIVisualThread(threading.Thread):
+	
+	def __init__(self, ui_ref, async_msg_thread_ref):
+		self.ui_ref = ui_ref
+		self.async_msg_thread_ref = async_msg_thread_ref
+		super().__init__()
+
+	def send_msg(self, id, msg):
+		self.async_msg_thread_ref.send(id, msg)
+
+
 	def run(self):
-		ui_ref.run()
+		self.ui_ref.run()
 
-def start_plot(num_values):
-	global ui_ref
-	ui_ref = MainApp()
-	UIThread().start()
-	time.sleep(1)
-	ui_ref.root.ids['plot'].config(num_values=num_values)
+class UIThread(AsyncMsgThread):
+	def __init__(self, async_msg_object, controller):
+		self.ui_instance = MainApp()
+		async_msg_object.handler = self.msg_handler
+		super().__init__(async_msg_object, controller)
 
-def update_plot(val):
-	global ui_ref
-	if ui_ref is None:
-		raise NullPointerException()
-	ui_ref.root.ids['plot'].add_element(val)
-	time.sleep(0.01)
+	def msg_handler(self, msg):
+		if msg is -1:
+			UIVisualThread(self.ui_instance, self).start()
+			time.sleep(1) # Give the for the UI to load
+			self.ui_instance.root.ids['plot'].config(num_values=5)
+		else:
+			self.ui_instance.root.ids['plot'].add_element(msg)

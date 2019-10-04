@@ -2,7 +2,9 @@
 import random
 import math
 from animals import Animal
-import ui_engine_api as ui_api
+import threading
+import time
+from async_msg import AsyncMsgThread
 
 # - Day Engine -> night and day logic
 # - Physics Engine
@@ -14,6 +16,9 @@ import ui_engine_api as ui_api
 # - Data Engine
 
 food_to_survive = 2
+
+def send_msg_to_thread(id, msg):
+	threading.current_thread().send_msg("UI-Engine", msg)
 
 class EvolSim:
 	def __init__(self, animal_num=200, food_num=600, world_dim=(200,200), day_len=20):
@@ -30,10 +35,7 @@ class EvolSim:
 	'''
 	def run(self, num_iter=1): 
 		print("Running simulation for " + str(num_iter))
-		num_days = int(num_iter/self.day_len)
-		# Each plot bar is a day
-		ui_api.start_plot(num_values=num_days)
-		
+		num_days = num_iter	
 		for i in range(0,num_days):
 			self.run_day()
 
@@ -43,10 +45,10 @@ class EvolSim:
 			self.consume_food()
 
 		surviving_animals = sum(2 if a.can_reproduce() else 1 if a.can_survive() else 0 for a in self.animals)
-		print(str(surviving_animals) + " survived!")
 		self.generate_world(surviving_animals, self.food_num)
 
-		ui_api.update_plot(surviving_animals)
+		send_msg_to_thread(0, surviving_animals)
+		time.sleep(0.1)
 
 	# 0.0.0 move animals in a random direction (4-way) with constant step
 	def update_animal_pos(self):
@@ -74,3 +76,16 @@ class EvolSim:
 		new_animal_pos = random.sample(range(0,self.world_x * self.world_y), num)
 		self.animals = list(map(lambda n: Animal(int(math.floor(n/self.world_y)), n % self.world_y), new_animal_pos))
 
+class SimEngineThread(AsyncMsgThread):
+	def __init__(self, async_msg_object, controller):
+		self.sim_instance = EvolSim()
+		async_msg_object.handler = self.msg_handler
+		super().__init__(async_msg_object, controller)
+
+	def msg_handler(self, msg):
+		msg_id, msg_val = msg
+		if msg_id == 0:
+			# Each plot bar is a day
+			send_msg_to_thread(0, -1)
+			return
+		self.sim_instance.run(100)

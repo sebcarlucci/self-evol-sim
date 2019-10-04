@@ -6,10 +6,15 @@ from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.stacklayout import StackLayout
 from kivy.properties import ObjectProperty, NumericProperty
 from kivy.uix.widget import Widget
-
+from kivy.clock import Clock
 from kivy.lang.builder import Builder
 
+import threading
 import random
+
+def test(dt):
+	threading.current_thread().async_msg_thread_ref.send_msg('Sim-Engine', (1,100))
+
 class MainApp(App):
 	def build(self):
 		return Builder.load_file("./widgets/main.kv")
@@ -47,6 +52,14 @@ class Plot(StackLayout):
 		print('new max')
 		for child in self.ids.values():
 			child.size_hint_y = child.val/max_val
+
+	def on_touch_down(self, pos):
+		self.value_cnt += 100
+		for child in self.ids.values():
+			child.size_hint_x = 1/self.value_cnt
+		Clock.schedule_once(test, 1)
+		
+		return True
 
 class RootLayout(BoxLayout):
 	pass

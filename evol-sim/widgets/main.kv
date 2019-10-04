@@ -1,7 +1,6 @@
 #:import hex kivy.utils.get_color_from_hex
 <PlotComponent>
 	id: 'test'
-	val: 0
 
 	canvas.before:
 		Color:
@@ -38,12 +37,14 @@
 			pos:self.pos
 			size:self.size
 	BoxLayout:
+		id: top_bar
 		orientation: 'horizontal'
 		size_hint_y: 0.2
 		Label:
 			text:"Data UI"
 			size_hint_x:0.8
 		Button:
+			id: btn_sim
 			text:"Run Sim"
 			size_hint_x: 0.2
 			on_touch_down: print('pressed')
