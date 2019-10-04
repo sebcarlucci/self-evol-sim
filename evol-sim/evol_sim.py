@@ -47,8 +47,7 @@ class EvolSim:
 		surviving_animals = sum(2 if a.can_reproduce() else 1 if a.can_survive() else 0 for a in self.animals)
 		self.generate_world(surviving_animals, self.food_num)
 
-		send_msg_to_thread(0, surviving_animals)
-		time.sleep(0.1)
+		send_msg_to_thread(0, (1,surviving_animals))
 
 	# 0.0.0 move animals in a random direction (4-way) with constant step
 	def update_animal_pos(self):
@@ -86,6 +85,6 @@ class SimEngineThread(AsyncMsgThread):
 		msg_id, msg_val = msg
 		if msg_id == 0:
 			# Each plot bar is a day
-			send_msg_to_thread(0, -1)
+			send_msg_to_thread(0, (-1, 100))
 			return
 		self.sim_instance.run(100)

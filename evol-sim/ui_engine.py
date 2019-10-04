@@ -9,6 +9,8 @@ from kivy.uix.widget import Widget
 from kivy.clock import Clock
 from kivy.lang.builder import Builder
 
+from kivy.graphics import Rectangle
+
 import threading
 import random
 
@@ -19,7 +21,7 @@ class MainApp(App):
 	def build(self):
 		return Builder.load_file("./widgets/main.kv")
 
-class PlotComponent(Widget):
+class PlotComponent(Rectangle):
 
 	def __init__(self,**kwargs):
 		if not any(k in kwargs.keys() for k in ['id', 'val']):
@@ -27,6 +29,7 @@ class PlotComponent(Widget):
 
 		self.val = kwargs['val']
 		del kwargs['val']
+		print(self.val)
 		super(PlotComponent, self).__init__(**kwargs)
 
 class Plot(StackLayout):
@@ -34,6 +37,7 @@ class Plot(StackLayout):
 	id_cnt = 0
 	ids = {}
 	max_val = NumericProperty(0)
+	value_cnt = NumericProperty(0)
 
 	def config(self, num_values):
 		self.value_cnt = num_values
@@ -42,23 +46,29 @@ class Plot(StackLayout):
 		if val > self.max_val:
 			self.max_val = val
 		# Add new plot component
-		new_plot_id = "pc_" + str(self.id_cnt)
-		new_plot = PlotComponent(size_hint=(1/self.value_cnt, 0 if self.max_val is 0 else val/self.max_val), id=new_plot_id, val=val)
-		self.add_widget(new_plot)
-		self.ids[new_plot_id] = new_plot
+		new_plot_id = self.id_cnt
+		with self.canvas:
+			self.ids[new_plot_id] = PlotComponent(size=(self.width/self.value_cnt, self.height * val / self.max_val), \
+											      id=self.id_cnt, val=val,                                            \
+											      pos=(self.id_cnt*self.width/self.value_cnt + self.x, self.y))
 		self.id_cnt += 1
 
+	def on_value_cnt(self, instance, value_cnt):
+		# Update the height
+		for id, child in self.ids.items():
+			child.size = self.width/value_cnt, self.height * child.val / self.max_val
+			child.pos = self.x + id * self.width / value_cnt, self.y
+
 	def on_max_val(self, instance, max_val):
-		print('new max')
 		for child in self.ids.values():
-			child.size_hint_y = child.val/max_val
+			child.size = child.size[0], self.height * child.val / max_val
 
 	def on_touch_down(self, pos):
 		self.value_cnt += 100
 		for child in self.ids.values():
 			child.size_hint_x = 1/self.value_cnt
-		Clock.schedule_once(test, 1)
-		
+		# Clock.schedule_once(test, 1)
+		test(0)
 		return True
 
 class RootLayout(BoxLayout):
