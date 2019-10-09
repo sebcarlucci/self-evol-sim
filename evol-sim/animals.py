@@ -17,14 +17,15 @@ class Animal():
 	def eat(self):
 		self.food += 1
 
+	def get_pos(self):
+		return self.posX, self.posY
+
 	def move(self, n, m):
 		flag = random.randint(0,2)
-		pos = random.randint(0,1)
+		delta = 3*random.random()
 		if flag is 1:
-			self.posX += 1 if pos is 1 else -1
+			self.posX += delta
 		else:
-			self.posY += 1 if pos is 1 else -1
-
+			self.posY += delta
 		self.posX %= n
 		self.posY %= m
-

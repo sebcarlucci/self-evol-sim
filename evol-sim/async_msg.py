@@ -3,6 +3,19 @@ import time
 import threading
 from multiprocessing import Queue
 
+class AsyncMsgEvents():
+	class SimEngineEvents():
+		start = 0
+		run   = 1
+	class UIEngineEvents():
+		start = 0
+		add_plot_element = 1
+		register_movement = 2
+		config_sim_ui = 3
+	class UIVisualEvents():
+		# This Thread does not receive messages
+		pass
+	
 '''
 Behaviour of the abstract_async_msg_objects
 '''
@@ -32,7 +45,8 @@ class AsyncMsgController(AbstractAsyncMsgObject):
 
 	valid_id = [	 			 \
 				'UI-Engine', 	 \
-				'Sim-Engine'     \
+				'Sim-Engine',    \
+				'UI-Visual'      \
 			   ]
 
 	def __init__(self):
@@ -64,8 +78,12 @@ class AsyncMsgController(AbstractAsyncMsgObject):
 		self.operator_map[op_id] = op
 
 	def build_operator(self, op_id):
+		print(op_id, self.valid_id)
 		if op_id not in self.valid_id:
 			raise IllegalArgumentException()
+		if op_id in self.operator_map:
+			raise OperatorExistsException()
+
 		op = AsyncMsgOperator()
 		self.operator_map[op_id] = op
 		return op
@@ -77,6 +95,14 @@ class AsyncMsgController(AbstractAsyncMsgObject):
 
 	def get_msg_q(self):
 		return self.__msg_q
+
+'''
+API to send messages to controller
+'''
+def send_msg_to_controller(id, msg, log=True, time_sleep=0.0001):
+	if log:
+		print(threading.current_thread(), 'sending', msg)
+	threading.current_thread().send_msg(id, msg, time_sleep)
 		
 class AsyncMsgOperator(AbstractAsyncMsgObject):
 
@@ -116,8 +142,11 @@ class AsyncMsgThread(threading.Thread):
 	def run(self):
 		self.async_msg_object.start()
 
-	def send_msg(self, id, msg):
+	def send_msg(self, id, msg, time_sleep):
 		self.async_msg_object.send((id, msg), self.controller.get_msg_q())
-		time.sleep(0.001)
+		time.sleep(time_sleep)
+
+	def msg_handler(self, msg):
+		raise NotImplementedError()
 
 

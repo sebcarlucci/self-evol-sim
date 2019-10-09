@@ -2,9 +2,9 @@
 import json
 from evol_sim import SimEngineThread
 from ui_engine_api import UIThread
-import ui_engine_api as ui_api
 import time
 from async_msg import AsyncMsgController
+from async_msg import AsyncMsgEvents as async_events
 
 DEF_CONFIG_FILE = "./config.json"
 
@@ -17,7 +17,7 @@ def init_sys(msg_controller, config=None):
 
 	ui_thread.start()
 	sim_thread.start()
-	msg_controller.send_to('Sim-Engine', (0,42))
+	msg_controller.send_to('Sim-Engine', (async_events.SimEngineEvents.start,100))
 	time.sleep(1)
 
 def main():
