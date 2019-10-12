@@ -1,7 +1,7 @@
 # async_msg.py
 import time
 import threading
-from multiprocessing import Queue
+from queue import Queue
 
 class AsyncMsgEvents():
 	class SimEngineEvents():
@@ -10,8 +10,11 @@ class AsyncMsgEvents():
 	class UIEngineEvents():
 		start = 0
 		add_plot_element = 1
-		register_movement = 2
-		config_sim_ui = 3
+		register_sim_add = 2
+		register_sim_update = 3
+		register_sim_clear = 4
+		register_sim_clear_all = 5
+		config_sim_ui = 6
 	class UIVisualEvents():
 		# This Thread does not receive messages
 		pass

@@ -29,18 +29,26 @@ class UIThread(AsyncMsgThread):
 			ui_visual_op = self.controller.build_operator('UI-Visual')
 			UIVisualThread(self.ui_instance, ui_visual_op, self.controller).start()
 			time.sleep(1) # Give time for the UI to load
-			# self.ui_instance.config(num_values=msg_val)
+
 		elif msg_event == async_events.UIEngineEvents.add_plot_element:
 			self.ui_instance.add_plot_element(msg_val)
-		elif msg_event == async_events.UIEngineEvents.register_movement:
-			if self.ui_instance.get_current_tab().tab_id == 'tab_simulation_view':
-				self.ui_instance.clear_entities()
-				# self.ui_instance.add_entity(pos=msg_val[0].get_pos())
-				animals, food = msg_val
-				self.ui_instance.add_animal_entities(animals)
-				# for a in animals:
-				# 	self.ui_instance.add_animal_entities(pos=a.get_pos())
-			
+
+		elif msg_event == async_events.UIEngineEvents.register_sim_add:
+			# if self.ui_instance.get_current_tab().tab_id == 'tab_simulation_view':
+			world = msg_val
+			self.ui_instance.init_sim_view(world)
+
+		elif msg_event == async_events.UIEngineEvents.register_sim_update:
+			# if self.ui_instance.get_current_tab().tab_id == 'tab_simulation_view':
+			world = msg_val
+			self.ui_instance.update_sim_view(world)
+		
+		elif msg_event == async_events.UIEngineEvents.register_sim_clear:
+			self.ui_instance.clear_entities(list_entities=msg_val)
+
+		elif msg_event == async_events.UIEngineEvents.register_sim_clear_all:
+			self.ui_instance.clear_entities()
+
 		elif msg_event == async_events.UIEngineEvents.config_sim_ui:
 			self.ui_instance.config_sim_ui(msg_val)
 

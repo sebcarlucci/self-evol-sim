@@ -34,7 +34,7 @@ class Plot(StackLayout):
 		# Add new plot component
 		new_plot_id = self.id_cnt
 		with self.canvas:
-			self.ids[new_plot_id] = PlotComponent(size=(self.width/self.value_cnt, self.height * val / self.max_val),
+			self.ids[new_plot_id] = PlotComponent(size=(self.width/self.value_cnt, 0 if self.max_val is 0 else self.height * val / self.max_val),
 											      id=self.id_cnt, val=val,
 											      pos=(self.id_cnt*self.width/self.value_cnt + self.x, self.y))
 		self.id_cnt += 1

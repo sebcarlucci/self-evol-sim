@@ -15,14 +15,14 @@ class MainApp(App):
 	def add_plot_element(self, val):
 		self.root.ids.data_view.ids.plot.add_element(val)
 
-	def add_animal_entities(self, animals):
-		self.root.ids.simulation_view.add_entities(AnimalView, animals)
+	def init_sim_view(self, world):
+		self.root.ids.simulation_view.add_entities(world)
 
-	def add_food_entity(self, pos, size=(5,5)):
-		self.root.ids.simulation_view.add_entities(FoodView,pos, size)
+	def update_sim_view(self, world):
+		self.root.ids.simulation_view.update_entities(world)
 
-	def clear_entities(self):
-		self.root.ids.simulation_view.clear_entities()
+	def clear_entities(self, **kwargs):
+		self.root.ids.simulation_view.clear_entities(**kwargs)
 
 	def config_sim_ui(self, scale):
 		self.root.ids.simulation_view.set_scale(scale)
