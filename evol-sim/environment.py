@@ -2,6 +2,7 @@
 import random
 from animals import Animal, Food
 from threading import Lock
+
 class Chunk():
 
 	def __init__(self, size, num, world_dim):
@@ -47,7 +48,6 @@ class Chunk():
 			return True
 
 		return False
-
 
 
 	def regenerate_entities(self, entities, chunks, update_list):
@@ -96,6 +96,9 @@ class Chunk():
 			food_eaten = animal.eat(self.foods)
 
 			if food_eaten is not None:
+				self.thread_lock.acquire(True)
+				self.foods.remove(food_eaten)
+				self.thread_lock.release()
 				status["eaten_foods"].append(food_eaten)
 
 		return status

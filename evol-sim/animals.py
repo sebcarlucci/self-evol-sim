@@ -20,7 +20,7 @@ class Entity():
 	def get_pos(self):
 		return self.pos
 
-
+animal_limit = 100
 class Animal(Entity):
 
 	def __init__(self, posX, posY):
@@ -79,7 +79,6 @@ class Animal(Entity):
 
 		if (target_x - x)**2 + (target_y - y)**2 < dist_thresh**2:
 			food_eaten = self.target
-			foods.remove(self.target)
 			self.food += 1
 
 		return food_eaten
@@ -95,7 +94,7 @@ class Animal(Entity):
 		# If the animal has not found a target yet, wander randomly
 		if self.target is None:
 			flag = random.randint(0,1)
-			delta = random.uniform(-speed,speed)
+			delta = random.uniform(-speed,2*speed)
 			
 			if flag is 1:
 				x += delta
@@ -111,7 +110,7 @@ class Animal(Entity):
 
 		self.pos = (x,y)
 
-
+food_limit = 200
 class Food(Entity):
 
 	def __init__(self, posX, posY):
@@ -137,6 +136,9 @@ class Food(Entity):
 		if "neighbours" not in kwargs:
 			raise IllegalArgumentException()
 		neighbours = kwargs["neighbours"]
+
+		if len(neighbours) >= food_limit:
+			return False
 
 		roots = self.get_roots()
 		cnt = len(roots)
