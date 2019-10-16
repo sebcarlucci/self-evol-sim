@@ -27,7 +27,7 @@ class EvolSim:
 		day_len: number of days the animals have to look for food
 		render_intvl: defines after how many days the Simulation UI gets updated
 	'''
-	def __init__(self, animal_num=10, food_num=200, world_dim=(6,6), day_len=100, render_intvl=20):
+	def __init__(self, animal_num=30, food_num=600, world_dim=(10,10), day_len=100, render_intvl=20):
 		print("Initializing simulation")
 		self.food_num = food_num
 		self.animal_num = animal_num
@@ -36,7 +36,7 @@ class EvolSim:
 		self.day_len = day_len
 		self.render_intvl = render_intvl
 
-		self.world = Environment(self.world_x, self.world_y, 30)
+		self.world = Environment(self.world_x, self.world_y, 10)
 		self.world.generate(animal_num, food_num)
 	
 	'''
@@ -80,7 +80,13 @@ class EvolSim:
 
 
 	def run_day(self):
-		send_msg_to_controller('UI-Engine', (async_events.UIEngineEvents.register_sim_add, self.world), log=False, time_sleep=5/200)
+		# Add all initial entities
+		# The world has a binary semaphore that gets released by the UI-Engine thread to signal
+		# that all entities have been rendered
+		self.world.thread_sem.acquire(True)
+		send_msg_to_controller('UI-Engine', (async_events.UIEngineEvents.register_sim_add, self.world), log=False, time_sleep=0.01)
+		self.world.thread_sem.acquire(True)
+
 		for tick in range(0,self.day_len):
 			eaten_foods = self.world.update()
 
@@ -94,8 +100,10 @@ class EvolSim:
 				id='UI-Engine', 
 				msg=(async_events.UIEngineEvents.register_sim_update, self.world), 
 				log=False, 
-				time_sleep=5/200
+				time_sleep=5/self.day_len
 			)
+
+		self.world.thread_sem.release()
 
 	# 0.0.0 consume food on a first come first serve basis
 	def consume_food(self):

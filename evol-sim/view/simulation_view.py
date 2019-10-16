@@ -82,6 +82,7 @@ class SimulationView(Widget):
 					pos = e.pos
 					pos = (pos[0] + chunk.pos[0] * chunk.size, pos[1] + chunk.pos[1] * chunk.size)
 					self.entity_map[e].pos = self.apply_scale(pos)
+
 				# Update food on canvas
 				foods = chunk.foods
 				for f in foods:

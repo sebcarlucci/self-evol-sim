@@ -46,7 +46,7 @@ class Animal(Entity):
 
 
 	def seek_food(self, foods):
-		if not foods:
+		if not foods or self.can_reproduce():
 			self.target = None
 			return
 
@@ -80,7 +80,7 @@ class Animal(Entity):
 		if (target_x - x)**2 + (target_y - y)**2 < dist_thresh**2:
 			food_eaten = self.target
 			self.food += 1
-
+			self.target = None
 		return food_eaten
 
 
@@ -94,7 +94,7 @@ class Animal(Entity):
 		# If the animal has not found a target yet, wander randomly
 		if self.target is None:
 			flag = random.randint(0,1)
-			delta = random.uniform(-speed,2*speed)
+			delta = random.uniform(-speed,speed)
 			
 			if flag is 1:
 				x += delta
@@ -104,13 +104,20 @@ class Animal(Entity):
 			target_x, target_y = self.target.pos
 			delta_x, delta_y = target_x - x, target_y - y
 			dist = sqrt(delta_x**2 + delta_y**2)
-			speed_x, speed_y = speed * delta_x / dist, speed * delta_y / dist
+
+			if (dist_thresh > dist and dist > 0) or dist < 0.01:
+				return
+			try:
+				speed_x, speed_y = speed * delta_x / dist, speed * delta_y / dist
+			except:
+				print(dist)
+				
 			x += speed_x
 			y += speed_y
 
 		self.pos = (x,y)
 
-food_limit = 200
+food_limit = 50
 class Food(Entity):
 
 	def __init__(self, posX, posY):

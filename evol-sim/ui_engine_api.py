@@ -37,6 +37,7 @@ class UIThread(AsyncMsgThread):
 			# if self.ui_instance.get_current_tab().tab_id == 'tab_simulation_view':
 			world = msg_val
 			self.ui_instance.init_sim_view(world)
+			world.thread_sem.release()
 
 		elif msg_event == async_events.UIEngineEvents.register_sim_update:
 			# if self.ui_instance.get_current_tab().tab_id == 'tab_simulation_view':

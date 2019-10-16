@@ -1,7 +1,7 @@
 # environment.py
 import random
 from animals import Animal, Food
-from threading import Lock
+from threading import Lock, Semaphore
 
 class Chunk():
 
@@ -91,6 +91,8 @@ class Chunk():
 			changed_chunk = self.handle_out_of_bound_entity(animal, chunks, update_list, from_chunk=self)
 			# print(changed_chunk)
 			if changed_chunk and (animal.target is not None):
+				print(animal.target)
+				animal.target = None
 				print("Warning: Animal out of chunk still has target in old chunk")
 			
 			food_eaten = animal.eat(self.foods)
@@ -112,6 +114,7 @@ class Environment():
 		self.m = m
 		self.chunk_size = chunk_size
 		self.update_list = []
+		self.thread_sem = Semaphore()
 
 
 	def generate(self, num_animal, num_food):
